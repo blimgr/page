@@ -15,7 +15,7 @@ This is where I'll write about things I find interesting — mostly programming,
 - Code samples — because walls of text are boring
 
 <figure>
-  <img src="./logo-aspire.svg" alt="image info 12">
+  <img src="./logos/logo-aspire.svg" alt="image info 12">
   <figcaption>Aspire .Net</figcaption>
 </figure>
 
