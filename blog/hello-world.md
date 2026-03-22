@@ -1,5 +1,3 @@
-# Hello, World12!
-
 Welcome to my blog! This is my first post, and it's mostly here to kick things off and verify that everything is working.
 
 ## What this blog is about
