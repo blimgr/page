@@ -1,0 +1,18 @@
+[
+  {
+    "slug": "hello-world",
+    "title": "Hello, World!",
+    "date": "2026-03-22",
+    "summary": "My first blog post — what this blog is about and what to expect.",
+    "tags": ["general", "c#"],
+    "contentPath": "blog/hello-world.md"
+  },
+  {
+    "slug": "hello-world2",
+    "title": "Hello, World! 2",
+    "date": "2026-03-22",
+    "summary": "My first blog post — what this blog is about and what to expect.",
+    "tags": ["c#"],
+    "contentPath": "blog/hello-world2.md"
+  }
+]
