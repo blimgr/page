@@ -1,10 +1,18 @@
 [
+    {
+    "slug": "test-doubles",
+    "title": "Test Doubles Cheatsheet",
+    "date": "2026-04-01",
+    "summary": "A quick summary of test double objects.",
+    "tags": ["Unit Testing", "Theory"],
+    "contentPath": "blog/test-doubles.md"
+  },
   {
     "slug": "hello-world",
     "title": "Hello, World!",
     "date": "2026-03-22",
     "summary": "My first blog post — what this blog is about and what to expect.",
-    "tags": ["general"],
+    "tags": ["General"],
     "contentPath": "blog/hello-world.md"
   }
 ]
