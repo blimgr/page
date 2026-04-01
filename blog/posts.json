@@ -1,5 +1,13 @@
 [
     {
+    "slug": "good-unit-tests",
+    "title": "Good Unit Tests",
+    "date": "2026-04-02",
+    "summary": "A quick summary of what are the qualities of a good unit test.",
+    "tags": ["Unit Testing", "Theory"],
+    "contentPath": "blog/good-unit-tests.md"
+    },
+    {
     "slug": "test-doubles",
     "title": "Test Doubles Cheatsheet",
     "date": "2026-04-01",
