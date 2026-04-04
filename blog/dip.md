@@ -1,13 +1,10 @@
 # The Dependency Inversion Principle
 
-The Dependency Inversion Principle is one of the five SOLID principles introduced by Robert C. Martin (known as Uncle Bob) — 
-a set of guidelines that form a foundation for writing object-oriented code that is maintainable, 
-flexible, and easy to change. SOLID stands for Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, and Dependency Inversion. 
-Each principle addresses a specific way that code tends to go wrong as systems grow.
+The Dependency Inversion Principle (DIP) is one of the five SOLID principles introduced by Robert C. Martin (Uncle Bob). It concerns the relationship between domain logic and low-level implementation — specifically, which one should know about the other, and who should own the contract between them.
 
 ## The Definition
 
-Robert Martin states the Dependency Inversion Principle in two parts:
+Robert Martin states the Dependency Inversion Principle in two parts (<a href="https://en.wikipedia.org/wiki/Dependency_inversion_principle" target="_blank" rel="noopener noreferrer">Wikipedia</a>, <a href="https://web.archive.org/web/20110714224327/http://www.objectmentor.com/resources/articles/dip.pdf" target="_blank" rel="noopener noreferrer">Original Paper</a>):
 
 > **A.** High-level modules should not depend on low-level modules. Both should depend on abstractions.
 >
@@ -18,7 +15,7 @@ Robert Martin states the Dependency Inversion Principle in two parts:
 
 In the following sections we will attempt to explain the Dependency Inversion Principle. To clearly illustrate these concepts, we will use the following scenario through the rest of the post.
 
-We have an `OrderService` — a class responsible for placing customer orders. It is a **high-level module**: it contains the important decisions in our system, the business rules, the orchestration logic, the policy. It answers the question *why*. It expresses what our system is *for*.
+We have an `OrderService` — a class responsible for placing customer orders. It is a **high-level module**: it contains the important decisions in our system, the business rules and the orchestration logic. It answers the question *why*. It expresses what our system is *for*.
 
 To do its job, it needs to persist orders somewhere, so it works with a `MySQLDatabase`. That is a **low-level module**: it handles the implementation details, the *how*. It doesn't know anything about the business — it just knows how to store data in a specific technical way.
 
@@ -93,7 +90,7 @@ In the naive version, the dependency flows top-down:
 OrderService  ──depends on──►  MySQLDatabase
 ```
 
-`OrderService` knows about `MySQLDatabase`. If `MySQLDatabase` changes, `OrderService` may have to change too. The high-level policy is at the mercy of the low-level detail.
+`OrderService` knows about `MySQLDatabase`. If `MySQLDatabase` changes, `OrderService` may have to change too. The domain logic is tightly coupled to the low-level detail.
 
 After applying Part A, the dependency arrows change:
 
@@ -213,3 +210,25 @@ public class OrderService
 But Part A is violated: `OrderService` ignores the abstraction entirely and depends directly on `MySQLDatabase`. It instantiates it internally and holds a concrete reference to it. Despite having a perfectly good interface available, the high-level module has reached past it and grabbed the low-level detail directly. Swapping the database still requires changing `OrderService`.
 
 Both parts need to hold for the principle to be satisfied. A clean abstraction means nothing if the high-level module doesn't use it. And depending on an abstraction means nothing if the abstraction is secretly shaped by the detail it hides.
+
+## Do NOT Abstract Everything
+
+DIP does not mean every class should be hidden behind an interface. Introducing an abstraction only makes sense when there is a meaningful variation to hide — a concrete thing that might change or need replacing. Wrapping a class that will never have a second implementation in an interface buys nothing; it just adds indirection with no benefit. Apply the principle where variation is real or reasonably anticipated, not as a blanket rule.
+
+## DIP and Dependency Injection
+
+Despite the similar names, Dependency Inversion and Dependency Injection have nothing in common. They answer completely different questions.
+
+DIP is a design principle about *what* your dependencies point to: high-level modules should depend on abstractions, not on low-level concretes. It says nothing about how those dependencies are obtained.
+
+Dependency Injection is a technique about *how* dependencies are supplied: rather than a class constructing its own dependencies, they are provided from the outside — via constructor, method, or property. It says nothing about whether those dependencies are abstractions or concretes.
+
+Because they are orthogonal, each can exist without the other:
+
+- **DI without DIP**: you could inject a concrete `MySQLDatabase` directly into `OrderService`. The dependency is supplied from outside, but it points straight at a low-level detail. The mechanics of injection are there; the principle is not.
+- **DIP without DI**: you could wire dependencies up manually — constructing objects and passing them explicitly — without any framework. As long as each class depends on the abstraction, DIP is fully satisfied.
+
+The reason they are often mentioned together is practical: DI is the most natural way to put DIP into practice. When dependencies are injected, it is straightforward to inject an abstraction instead of a concrete. DI is simply a tool that makes honouring DIP easier — not a substitute for it, and not the same thing as it.
+## Conclusion
+
+The Dependency Inversion Principle is, at its core, about ownership. High-level modules should own the abstractions they rely on — defining them in terms of what they *need*, not in terms of what some low-level module happens to *offer*. When that ownership is in the right place, the direction of every dependency in a system can point inward toward domain logic rather than outward toward detail (See <a href="https://en.wikipedia.org/wiki/Robert_C._Martin#Clean_Architecture" target="_blank" rel="noopener noreferrer">Clean Architecture</a>). The result is code where the parts that matter most — the business rules — are insulated from the parts that change most often.

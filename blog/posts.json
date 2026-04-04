@@ -1,18 +1,35 @@
 [
-    {
+  {
+    "slug": "dip",
+    "title": "Dependency Inversion Principle",
+    "date": "2026-04-04",
+    "summary": "An explanation of the Dependency Inversion Principle.",
+    "tags": [
+      "Design",
+      "Theory"
+    ],
+    "contentPath": "blog/dip.md"
+  },
+  {
     "slug": "good-unit-tests",
     "title": "Good Unit Tests",
     "date": "2026-04-02",
     "summary": "A quick summary of what are the qualities of a good unit test.",
-    "tags": ["Unit Testing", "Theory"],
+    "tags": [
+      "Unit Testing",
+      "Theory"
+    ],
     "contentPath": "blog/good-unit-tests.md"
-    },
-    {
+  },
+  {
     "slug": "test-doubles",
     "title": "Test Doubles Cheatsheet",
     "date": "2026-04-01",
     "summary": "A quick summary of test double objects.",
-    "tags": ["Unit Testing", "Theory"],
+    "tags": [
+      "Unit Testing",
+      "Theory"
+    ],
     "contentPath": "blog/test-doubles.md"
   },
   {
@@ -20,7 +37,9 @@
     "title": "Hello, World!",
     "date": "2026-03-22",
     "summary": "My first blog post — what this blog is about and what to expect.",
-    "tags": ["General"],
+    "tags": [
+      "General"
+    ],
     "contentPath": "blog/hello-world.md"
   }
 ]
