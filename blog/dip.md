@@ -217,7 +217,7 @@ In engineering no principle, tool or technique should be applied blindly, withou
 
 ## DIP and Dependency Injection
 
-Despite the similar names, Dependency Inversion and Dependency Injection have nothing in common. They answer completely different questions.
+Another common point of confusion is the distinction between the Dependency Inversion Principle and Dependency Injection. Despite the similar names, they are concerned with completely different aspects of dependencies—in other words, they answer completely different questions.
 
 DIP is a design principle about *what* your dependencies point to: high-level modules should depend on abstractions, not on low-level concretes. It says nothing about how those dependencies are obtained.
 
