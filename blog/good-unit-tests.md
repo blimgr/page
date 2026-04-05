@@ -1,6 +1,13 @@
 # Good Unit Tests
 
----
+## Intro
+A unit test checks a small piece of code in isolation—no databases, filesystems, APIs, or other external systems involved. It runs in-process and finishes pretty fast.
+
+This post is meant to be a quick reference for what makes a good unit test. For a deeper dive, check out <a href="https://martinfowler.com/bliki/UnitTest.html" target="_blank">Martin Fowler’s post</a> and the relevant bibliography.
+
+So, without further ado:
+
+
 
 ## 1. Single Responsibility
 
@@ -36,7 +43,7 @@ public void CreateUser_ValidName_SetsName() { ... }
 public void CreateUser_AdminFlag_GrantsAdminRole() { ... }
 ```
 
----
+
 
 ## 2. Descriptive Test Names
 
@@ -58,7 +65,7 @@ public void GetUser_UserHasNoEmail_ReturnsNull() { ... }
 public void PlaceOrder_InsufficientStock_ThrowsInvalidOperationException() { ... }
 ```
 
----
+
 
 ## 3. Isolated
 
@@ -86,7 +93,7 @@ public void GetUser_ExistingId_ReturnsUser()
 }
 ```
 
----
+
 
 ## 4. Fast
 
@@ -112,8 +119,6 @@ public void ExpireToken_PastExpiry_IsExpired()
     Assert.True(token.IsExpired);
 }
 ```
-
----
 
 ## 5. Tests Public Interface
 
@@ -145,7 +150,7 @@ public void GetTotal_OneItemAdded_ReturnsTotalPrice()
 }
 ```
 
----
+
 
 ## 6. Deterministic
 
@@ -172,7 +177,7 @@ public void GenerateToken_ExpiryInFuture_IsNotExpired()
 }
 ```
 
----
+
 
 ## 7. Covers Edge Cases
 
@@ -202,7 +207,7 @@ public void Parse_BlankOrNullInput_ThrowsArgumentException(string input)
 }
 ```
 
----
+
 
 ## 8. Independent
 
@@ -236,7 +241,7 @@ public void GetTotal_OneItemAdded_ReturnsTotalPrice()
 }
 ```
 
----
+
 
 ## 9. Readable (Arrange–Act–Assert)
 
@@ -258,7 +263,7 @@ public void GetTotal_OneItemAdded_ReturnsTotalPrice()
 }
 ```
 
----
+
 
 ## 10. No Test Logic
 
@@ -290,7 +295,7 @@ public void ApplyDiscount_ValidRate_ReturnsDiscountedPrice(
 }
 ```
 
----
+
 
 ## 11. Correct
 
@@ -352,12 +357,12 @@ public void PlaceOrder_InsufficientStock_ThrowsInvalidOperationException()
 }
 ```
 
----
+
 
 ## Quick reference
 
 | # | Attribute | Key question |
-|---|-----------|-------------|
+||--|-|
 | 1 | Single Responsibility | Does this test verify exactly one logical concept? |
 | 2 | Descriptive Name | Does it follow `TestedMethod_ScenarioTested_ExpectedBehaviour`? |
 | 3 | Isolated | Does it avoid network, disk, and shared state? |
