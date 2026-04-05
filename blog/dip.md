@@ -13,7 +13,7 @@ Robert Martin states the Dependency Inversion Principle in two parts (<a href="h
 
 ## The Scenario
 
-In the following sections we will attempt to explain the Dependency Inversion Principle. To clearly illustrate these concepts, we will use the following scenario through the rest of the post.
+In the following sections we will attempt to explain the Dependency Inversion Principle. To clearly illustrate its concepts, we will use the following scenario through the rest of the post.
 
 We have an `OrderService` — a class responsible for placing customer orders. It is a **high-level module**: it contains the important decisions in our system, the business rules and the orchestration logic. It answers the question *why*. It expresses what our system is *for*.
 
@@ -117,7 +117,7 @@ When people think about an abstraction depending on a detail, they usually think
 - **Exception contracts** — if the interface's implied contract includes throwing `SqlException`, it has leaked a detail through its error model.
 - **Method structure** — an interface with `BeginTransaction()`, `Commit()`, and `Rollback()` is encoding a transactional relational model, even if every type in the signatures is generic.
 
-Any of these can make an abstraction secretly dependent on the detail it is supposed to hide.
+Any of these can make an abstraction subtly dependent on the detail it is supposed to hide.
 
 ### Context determines what counts as a detail
 
