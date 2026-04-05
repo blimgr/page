@@ -113,7 +113,7 @@ When people think about an abstraction depending on a detail, they usually think
 
 - **Naming** — a method called `ExecuteSqlQuery()` on an `IDatabase` interface encodes a detail in the name itself, even if the signature uses only primitive types.
 - **Parameter shape** — a method that takes a `connectionString` implies a connection-string-based system. A method that takes a `SqlTransaction` implies SQL. The parameters may be common types, but their shape reveals the underlying detail.
-- **Return values** — returning a `DataTable` or `SqlDataReader` ties callers to a relational concept, even if the interface otherwise looks abstract.
+- **Return values** — returning a `DataTable` or `DbDataReader` ties callers to a relational concept, even if the interface otherwise looks abstract.
 - **Exception contracts** — if the interface's implied contract includes throwing `SqlException`, it has leaked a detail through its error model.
 - **Method structure** — an interface with `BeginTransaction()`, `Commit()`, and `Rollback()` is encoding a transactional relational model, even if every type in the signatures is generic.
 
