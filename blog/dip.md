@@ -213,7 +213,7 @@ Both parts need to hold for the principle to be satisfied. A clean abstraction m
 
 ## Do NOT Abstract Everything
 
-DIP does not mean every class should be hidden behind an interface. Introducing an abstraction only makes sense when there is a meaningful variation to hide — a concrete thing that might change or need replacing. Wrapping a class that will never have a second implementation in an interface buys nothing; it just adds indirection with no benefit. Apply the principle where variation is real or reasonably anticipated, not as a blanket rule.
+In engineering no principle, tool or technique should be applied blindly, without taking under consideration the problem at hand. The Dependency Inversion Principle (DIP) is no exception—it doesn’t mean that every class should be hidden behind an interface. Introducing an abstraction only makes sense when there is a meaningful variation to hide — a concrete thing that might change or need replacing. Wrapping a class that will never have a second implementation in an interface buys nothing; it just adds indirection with no benefit. Apply the principle where variation is real or reasonably anticipated, not as a blanket rule.
 
 ## DIP and Dependency Injection
 
