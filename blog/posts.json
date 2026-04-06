@@ -1,5 +1,16 @@
 [
   {
+    "slug": "ioc",
+    "title": "Inversion of Control",
+    "date": "2026-04-07",
+    "summary": "An explanation of Inversion of Control (IoC) and its relationship with Dependency Injection (DI) and DI containers.",
+    "tags": [
+      "Design",
+      "Theory"
+    ],
+    "contentPath": "blog/ioc.md"
+  },
+  {
     "slug": "dip",
     "title": "Dependency Inversion Principle",
     "date": "2026-04-04",

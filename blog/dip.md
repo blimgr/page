@@ -226,7 +226,7 @@ Dependency Injection is a technique about *how* dependencies are supplied: rathe
 Because they are orthogonal, each can exist without the other:
 
 - **DI without DIP**: you could inject a concrete `MySQLDatabase` directly into `OrderService`. The dependency is supplied from outside, but it points straight at a low-level detail. The mechanics of injection are there; the principle is not.
-- **DIP without DI**: you could wire dependencies up manually — constructing objects and passing them explicitly — without any framework. As long as each class depends on the abstraction, DIP is fully satisfied.
+- **DIP without DI**: you could wire dependencies using a Factory, a Service Locator or Template Methods (But can you have DIP without IoC?).
 
 The reason they are often mentioned together is practical: DI is the most natural way to put DIP into practice. When dependencies are injected, it is straightforward to inject an abstraction instead of a concrete. DI is simply a tool that makes honouring DIP easier — not a substitute for it, and not the same thing as it.
 ## Conclusion
