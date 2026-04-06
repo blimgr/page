@@ -27,8 +27,6 @@ Something you may have come across is the well known Hollywood saying:
 | Module wiring        | Dependencies manually composed in code                   | Composition defined externally                       | Container / configuration| Composition root, DI configuration        |
 
 
-That last one is the most famous application of IoC, but it's just one flavor. IoC is the *why*. DI is one of the *hows*.
-
 ### Dependency Inversion and Inversion of Control
 What is the connection between DIP and IoC? This was a question on the previous 
 <a href="#/blog/dip">post</a>. As soon as you apply DIP, something has to be responsible for providing the concrete implementations behind your abstractions — and that something is always a form of IoC. That could be:
