@@ -1,13 +1,13 @@
 # Inversion of Control (IoC): Dependency Injection Explained
 
 ## Introduction
-In previous [post](/#/blog/dip), we have explored the Dependency Inversion Principle (DIP) and how it differs from Dependency Injection (DI). However, any discussion of these topics would be incomplete without also addressing Inversion of Control (IoC) and DI containers.
+In previous [post](#/blog/dip), we have explored the Dependency Inversion Principle (DIP) and how it differs from Dependency Injection (DI). However, any discussion of these topics would be incomplete without also addressing Inversion of Control (IoC) and DI containers.
 
 All of these terms are important in software engineering, widely used, and often misunderstood or used interchangeably. This post aims to clarify their meaning and disambiguate them.
 
 It begins by establishing clear definitions of IoC and DI containers, building on the definitions already introduced for DIP and DI. It then explores how these concepts relate to one another.
 
-While the relationship between DIP and DI has already been examined in previous [post](/#/blog/dip), this post focuses on how DI relates to DI containers and where IoC fits into the overall picture.
+While the relationship between DIP and DI has already been examined in previous [post](#/blog/dip), this post focuses on how DI relates to DI containers and where IoC fits into the overall picture.
 
 ## Inversion of Control (IoC)
 Inversion of Control (IoC) is a high-level design principle in which, contrary to traditional control flow where application code directs execution and manages dependencies, control over aspects of a program’s behavior—such as object creation, execution flow, and lifecycle management—is delegated to an external orchestrator. This principle is independent of specific implementations and can be realized through various techniques (e.g., dependency injection, event-driven callbacks, or framework-driven execution).
@@ -31,7 +31,7 @@ That last one is the most famous application of IoC, but it's just one flavor. I
 
 ### Dependency Inversion and Inversion of Control
 What is the connection between DIP and IoC? This was a question on the previous 
-[post](/#/blog/dip). As soon as you apply DIP, something has to be responsible for providing the concrete implementations behind your abstractions — and that something is always a form of IoC. That could be:
+[post](#/blog/dip). As soon as you apply DIP, something has to be responsible for providing the concrete implementations behind your abstractions — and that something is always a form of IoC. That could be:
 * A DI container resolving constructor dependencies
 * A factory creating the concrete instance
 * A service locator looking it up at runtime
