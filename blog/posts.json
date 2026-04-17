@@ -3,7 +3,7 @@
     "slug": "magic-values",
     "title": "Constants Don’t Fix Magic Values — Names Do",
     "date": "2026-04-18",
-    "summary": "An explanation of why using meaningful names is more effective than using constants to avoid magic values.",
+    "summary": "An explanation of why using meaningful names is more effective than just using constants to avoid magic values.",
     "tags": [
       "Design",
       "Theory"
