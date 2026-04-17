@@ -28,8 +28,7 @@ Something you may have come across is the well known Hollywood saying:
 
 
 ### Dependency Inversion and Inversion of Control
-What is the connection between DIP and IoC? This was a question on the previous 
-<a href="#/blog/dip">post</a>. As soon as you apply DIP, something has to be responsible for providing the concrete implementations behind your abstractions — and that something is always a form of IoC. That could be:
+What is the connection between DIP and IoC? As soon as you apply DIP, something has to be responsible for providing the concrete implementations behind your abstractions — and that something is always a form of IoC. That could be:
 * A DI container resolving constructor dependencies
 * A factory creating the concrete instance
 * A service locator looking it up at runtime
