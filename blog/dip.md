@@ -219,14 +219,14 @@ In engineering no principle, tool or technique should be applied blindly, withou
 
 Another common point of confusion is the distinction between the Dependency Inversion Principle and Dependency Injection. Despite the similar names, they are concerned with completely different aspects of dependencies—in other words, they answer completely different questions.
 
-DIP is a design principle about *what* your dependencies point to: high-level modules should depend on abstractions, not on low-level concretes. It says nothing about how those dependencies are obtained.
+DIP is a design principle about *what* your dependencies point to: modules should depend on abstractions, not on concretes. It says nothing about how those dependencies are obtained.
 
 Dependency Injection is a technique about *how* dependencies are supplied: rather than a class constructing its own dependencies, they are provided from the outside — via constructor, method, or property. It says nothing about whether those dependencies are abstractions or concretes.
 
 Because they are orthogonal, each can exist without the other:
 
 - **DI without DIP**: you could inject a concrete `MySQLDatabase` directly into `OrderService`. The dependency is supplied from outside, but it points straight at a low-level detail. The mechanics of injection are there; the principle is not.
-- **DIP without DI**: you could wire dependencies using a Factory, a Service Locator or Template Methods (But can you have DIP without IoC?).
+- **DIP without DI**: you could wire dependencies using a Factory, a Service Locator or Template Methods (But can you have DIP entirely without IoC?).
 
 The reason they are often mentioned together is practical: DI is the most natural way to put DIP into practice. When dependencies are injected, it is straightforward to inject an abstraction instead of a concrete. DI is simply a tool that makes honouring DIP easier — not a substitute for it, and not the same thing as it.
 ## Conclusion
