@@ -6,7 +6,7 @@ A concept that is often misunderstood — especially by people with a background
 
 ## How `this` works
 
-In a language that defaults to compile-time binding such as Java, C#, or C++, the value of `this` is determined at compile time and always refers to the current instance of the class.
+In a language that defaults to compile-time binding such as Java, C#, or C\+\+, the value of `this` is determined at compile time and always refers to the current instance of the class.
 
 In contrast, in a language that defaults to runtime binding such as JavaScript and TypeScript, the value of `this` is determined at runtime based on how a function is called.
 
@@ -22,11 +22,25 @@ Let's look at what the <a href="https://developer.mozilla.org/en-US/docs/Web/Jav
 
 Already we can see that the meaning of `this` is more complex than just referring to the current instance of a class.
 
-### Function context
+### JavaScript `this` Behavior Table (Corrected)
 
-There are four main ways a function can be called, and each one sets `this` differently.
-
-#### 1. Default binding (global or `undefined`)
+|Context|Scenario|What `this` refers to|
+|:---|:---|:---|
+|**Function**|Plain function called as a method (`obj.fn()`)|The **receiver** (the object before the dot)|
+|**Function**|Plain function called without an object|`undefined` (strict mode) / `globalThis` (non-strict mode)|
+|**Function**|Function called with `call` / `apply`|The object passed as the first argument|
+|**Function**|Function created with `bind`|The object passed to `bind` (permanently bound)|
+|**Function**|Arrow function|Lexically captured from surrounding scope (at definition time)|
+|**Class**|Instance method|The **receiver** (usually the instance) or `undefined` (strict mode) / `globalThis` (non-strict mode) if no receiver.|
+|**Class**|Static method|The **receiver** (usually the class used to call it) or `undefined` (strict mode) / `globalThis` (non-strict mode) if no receiver.|
+|**Class**|Arrow function property|Lexically captured `this` (in class fields: the instance)|
+|**Class**|Constructor|The newly created instance|
+|**Class**|Instance getter / setter|The **receiver** (usually the instance) or `undefined` (strict mode) / `globalThis` (non-strict mode) if no receiver.|
+|**Class**|Static getter / setter|The **receiver** (usually the class used to call it) or `undefined` (strict mode) / `globalThis` (non-strict mode) if no receiver.|
+|**Class**|Instance property initializer|The instance being created|
+|**Class**|Static property initializer|The class (constructor)|
+|**Class**|Static initialization block|The class (constructor)|
+|**Global**|Global execution context|`globalThis`|
 
 When a function is called as a plain function — not as a method, not with `new` — `this` falls back to the global object in non-strict mode (`window` in browsers, `global` in Node.js), or `undefined` in strict mode.
 
@@ -38,7 +52,7 @@ function greet() {
 greet();
 ```
 
-TypeScript projects almost always run in strict mode, which means calling a function this way and relying on `this` will throw a runtime error. This is usually the first surprise for developers coming from Java or C#.
+TypeScript projects almost always run in strict mode, which means calling a function this way and relying on `this` will throw a runtime error. This is usually the first surprise for developers coming from Java or C#. Someone could argue that this is a special case of 2 where the call site is the `window` `global` or `undefined`.
 
 #### 2. Implicit binding (method call)
 
@@ -69,7 +83,6 @@ By pulling `greet` out of the object and calling it as a plain function, we lost
 JavaScript provides three built-in methods to explicitly set `this` when calling a function.
 
 `call` and `apply` invoke the function immediately, with `this` set to the first argument. The difference is in how you pass the remaining arguments: `call` takes them as a comma-separated list, while `apply` takes them as an array.
-
 
 ```typescript
 function greet(this: { name: string }, greeting: string) {
@@ -130,6 +143,7 @@ The regular `inner` function creates its own `this` binding. Since it is called 
 ### Class context
 
 #### 1. Methods
+
 In TypeScript classes, `this` inside a method refers to the instance of the class — but only when the method is called as a method. If you extract the method and call it as a plain function, the same problem applies.
 
 ```typescript
@@ -147,7 +161,9 @@ counter.increment(); // works fine
 const fn = counter.increment;
 fn(); // Runtime error: Cannot set properties of undefined
 ```
+
 #### 2. Constructors
+
 Inside a constructor, `this` refers to the new instance being created — straightforward enough. The gotcha appears in subclass constructors: you must call `super()` before accessing `this`. Attempting to use `this` before `super()` is a hard error both at runtime and in TypeScript.
 
 ```typescript
@@ -221,14 +237,13 @@ const methods: Methods & ThisType<State> = {
 
 TypeScript infers `this` as `State` inside every method in the object, without any per-method `this` parameter annotation. Like the `this` parameter, it is erased at runtime — it is purely a compile-time signal.
 
-
 ## Common pitfalls
 
 ### Assigning a method to a function type
 
 This can happen when you do an explicit assignment of a method to a variable with a function type or when you pass a method as an argument of function type. In both cases, the method loses its `this` context, because when it is called, there is no object to provide the context.
 
-This is the single most common `this` bug in TypeScript. 
+This is the single most common `this` bug in TypeScript.
 
 You define a class, write a method, and then pass it as a callback — and `this` vanishes.
 
@@ -365,26 +380,28 @@ The root of all `this` confusion in TypeScript is that `this` is a runtime conce
 
 ### `this` resolution by calling pattern
 
-| Calling pattern | Value of `this` | Notes |
-|---|---|---|
-| Plain function call `fn()` | `undefined` (strict) / global object | Strict mode is default in TypeScript |
-| Method call `obj.fn()` | `obj` | The object to the left of the dot |
-| `fn.call(ctx, ...)` | `ctx` | Invoked immediately |
-| `fn.apply(ctx, [...])` | `ctx` | Invoked immediately, args as array |
-| `fn.bind(ctx)()` | `ctx` | Returns a new function, permanent |
-| `new Fn()` | New instance | A fresh object is created |
-| Arrow function | Lexical `this` from enclosing scope | Set at definition time, not call time |
-| Static method `Class.fn()` | `Class` itself | In subclasses, `this` is the subclass |
-| Arrow function + `bind` | Lexical `this` (unchanged) | `bind` has no effect on arrow functions |
+
+|Calling pattern|Value of `this`|Notes|
+|:---|:---|:---|
+|Plain function call `fn()`|`undefined` (strict) / global object|Strict mode is default in TypeScript|
+|Method call `obj.fn()`|`obj`|The object to the left of the dot|
+|`fn.call(ctx, ...)`|`ctx`|Invoked immediately|
+|`fn.apply(ctx, [...])`|`ctx`|Invoked immediately, args as array|
+|`fn.bind(ctx)()`|`ctx`|Returns a new function, permanent|
+|`new Fn()`|New instance|A fresh object is created|
+|Arrow function|Lexical `this` from enclosing scope|Set at definition time, not call time|
+|Static method `Class.fn()`|`Class` itself|In subclasses, `this` is the subclass|
+|Arrow function \+ `bind`|Lexical `this` (unchanged)|`bind` has no effect on arrow functions|
 
 ### Common pitfalls and mitigations
 
-| Pitfall | Root cause | TypeScript detection | Fix |
-|---|---|---|---|
-| Method passed as callback (`setTimeout`, event handler, etc.) | Implicit binding lost when detached from object | Not caught by default; add `this` parameter to detect | Arrow function field or `bind` in constructor |
-| Destructuring a method `const { fn } = obj` | Same as above — method detached from object | Not caught by default | Arrow function field or `bind` in constructor |
-| Nested regular function inside a method | Regular function creates its own `this` binding | `noImplicitThis` (part of `strict`) flags `this` as implicit `any` | Replace nested function with an arrow function |
-| Using `this` before `super()` in a subclass constructor | Parent class has not yet initialised the instance | Hard compile-time error in TypeScript | Call `super()` first |
-| Expecting static methods to be fixed to the defining class | Static `this` is dynamic — refers to the class it is called on | No error; intentional behaviour | Use intentionally for factory patterns; document the expectation |
+
+|Pitfall|Root cause|TypeScript detection|Fix|
+|:---|:---|:---|:---|
+|Method passed as callback (`setTimeout`, event handler, etc.)|Implicit binding lost when detached from object|Not caught by default; add `this` parameter to detect|Arrow function field or `bind` in constructor|
+|Destructuring a method `const { fn } = obj`|Same as above — method detached from object|Not caught by default|Arrow function field or `bind` in constructor|
+|Nested regular function inside a method|Regular function creates its own `this` binding|`noImplicitThis` (part of `strict`) flags `this` as implicit `any`|Replace nested function with an arrow function|
+|Using `this` before `super()` in a subclass constructor|Parent class has not yet initialised the instance|Hard compile-time error in TypeScript|Call `super()` first|
+|Expecting static methods to be fixed to the defining class|Static `this` is dynamic — refers to the class it is called on|No error; intentional behaviour|Use intentionally for factory patterns; document the expectation|
 
 TypeScript does not solve the problem at the language level, but it gives you tools — the `this` parameter, `ThisType<T>`, and strict mode — to catch misuse early. Understanding where `this` is set, and applying the patterns shown above, is all you need to write TypeScript that behaves exactly as you expect.
