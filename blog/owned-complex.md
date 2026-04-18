@@ -19,6 +19,7 @@ Owned types allow you to group properties into a class that doesn't have its own
 * **Database:** Usually stored in the same table as the parent (Table Splitting).
 * **Identity:** Uses a "Shadow Key" linked to the parent.
 * **Sharing:** **Cannot be shared** in the database. An instance belongs to exactly one parent.
+* **Querying:** Automatically included when you load the parent — no `.Include()` needed.
 
 ### C. Complex Types (EF Core 8+)
 The new "Value Object" champion. These are groups of properties with no identity whatsoever.
@@ -35,10 +36,11 @@ The new "Value Object" champion. These are groups of properties with no identity
 | **Primary Key** | Yes (Unique ID) | Shadow Key (Owner's ID) | **No Key** |
 | **DB Storage** | Separate Table | Same or Separate Table ¹ | **Same Table Only** ² |
 | **Nullability** | Can be null | Can be null | Non-null (EF8); Nullable (EF9+) |
-| **Collections** | `List<Entity>` | `OwnsMany` | Not supported (EF8) |
+| **Collections** | `HasMany`, `ToMany` | `OwnsMany` | Not supported (EF8) |
 | **Instance Sharing** | Allowed | **Forbidden** (Throws error) | **Allowed** (Value-copy) |
+| **Auto-included in queries** | No (requires `.Include()`) | **Yes** | **Yes** |
 
-> ¹ Owned Types can be split to a separate table via `ToTable()`.
+> ¹ Owned Types can be split to a separate table via `ToTable()`.  
 > ² Complex Types do **not** support `ToTable()` and always stay in the parent's table.
 
 ---
@@ -67,16 +69,44 @@ product2.Price = myPrice; // Works perfectly!
 *Note: In the database, the price values will be copied into the columns for both products. They are not "linked," but the code is much cleaner.*
 
 ### The Tracking Difference
-Owned Types are tracked as full entities — you can inspect or manipulate their change-tracking state via `context.Entry()`. Complex Types have no individual tracking entry; EF Core snapshots their values as part of the parent.
+
+**Owned Types** are tracked as full entities. When you mutate a property, EF Core detects the change via its snapshot mechanism and marks the owned entry as `Modified`. You can also inspect or force state changes via `context.Entry()`.
 
 ```csharp
-// Owned Type — individual entry access works:
-var entry = context.Entry(user.HomeAddress);
-Console.WriteLine(entry.State); // e.g., Modified
+// Mutating an owned type property
+user.HomeAddress.Street = "456 New Road";
 
-// Complex Type — no individual entry; this throws:
-context.Entry(product.Size); // ERROR: InvalidOperationException
+await context.SaveChangesAsync();
+// EF Core detects the change and issues: UPDATE Users SET HomeAddress_Street = '456 New Road' WHERE Id = 1
 ```
+
+```csharp
+// You can also inspect the owned entry directly:
+var entry = context.Entry(user.HomeAddress);
+Console.WriteLine(entry.State);           // Modified
+Console.WriteLine(entry.Property(a => a.Street).IsModified); // True
+```
+
+**Complex Types** have no individual tracking entry. EF Core snapshots their values as part of the *parent* entity. Mutations are still detected, but only through the parent.
+
+```csharp
+// Replacing a complex type value using 'with' (records are immutable)
+product.Size = product.Size with { Height = 15.0 };
+
+await context.SaveChangesAsync();
+// EF Core detects the change via the parent snapshot and issues: UPDATE Products SET Size_Height = 15 WHERE Id = 1
+```
+
+```csharp
+// You cannot inspect a complex type entry directly:
+context.Entry(product.Size); // ERROR: InvalidOperationException
+
+// Instead, inspect it through the parent's ComplexProperty:
+var sizeEntry = context.Entry(product).ComplexProperty(p => p.Size);
+Console.WriteLine(sizeEntry.Property(s => s.Height).IsModified); // True
+```
+
+The practical upshot: both detect mutations and produce correct UPDATEs, but only Owned Types give you a first-class `EntityEntry` to work with.
 
 ---
 
@@ -148,6 +178,7 @@ modelBuilder.Entity<Product>().ComplexProperty(p => p.Size);
 * The data belongs strictly to one parent.
 * You need a **Collection** of child objects (e.g., `User.PhoneNumbers`).
 * You need the property to be optional (null).
+* You want the data loaded automatically without `.Include()`.
 
 ### Use **Complex Types** when:
 * You are following **Domain-Driven Design (DDD)** and using Value Objects.
