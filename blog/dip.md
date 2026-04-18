@@ -1,6 +1,6 @@
 # The Dependency Inversion Principle
 
-The Dependency Inversion Principle (DIP) is one of the five SOLID principles introduced by Robert C. Martin (Uncle Bob). It concerns the relationship between domain logic and low-level implementation — specifically, which one should know about the other, and who should own the contract between them.
+The Dependency Inversion Principle (DIP), introduced by Robert C. Martin (Uncle Bob), is one of the five SOLID principles. . It focuses on the relationship between domain logic and low-level implementation, specifically reversing the direction of dependency.
 
 ## The Definition
 
@@ -15,7 +15,7 @@ Robert Martin states the Dependency Inversion Principle in two parts (<a href="h
 
 In the following sections we will attempt to explain the Dependency Inversion Principle. To clearly illustrate its concepts, we will use the following scenario through the rest of the post.
 
-We have an `OrderService` — a class responsible for placing customer orders. It is a **high-level module**: it contains the important decisions in our system, the business rules and the orchestration logic. It answers the question *why*. It expresses what our system is *for*.
+We have an `OrderService` — a class responsible for placing customer orders. It is a **high-level module**: it contains the important decisions in our system, the business rules and the orchestration logic. It defines *what* the system does and the rules that govern it.
 
 To do its job, it needs to persist orders somewhere, so it works with a `MySQLDatabase`. That is a **low-level module**: it handles the implementation details, the *how*. It doesn't know anything about the business — it just knows how to store data in a specific technical way.
 
@@ -46,7 +46,7 @@ public class OrderService
 
 This seems straightforward, but it creates a problem: `OrderService` is now tightly coupled to `MySQLDatabase`. If you want to swap the database, write a test with a fake database, or reuse `OrderService` in a different context, you have to reach inside your business logic to do it.
 
-Part A says this is wrong. Instead, both modules should depend on an **abstraction** — an interface or abstract class that defines a contract without specifying the implementation:
+Part A says this is wrong. Instead of high-level code depending directly on low-level implementation, both should depend on an abstraction — an interface or abstract class that defines a contract without specifying the implementation:
 
 ```csharp
 public interface IDatabase
@@ -100,7 +100,7 @@ OrderService  ──depends on──►  IDatabase  ◄──implements──  M
 
 `MySQLDatabase` now depends on `IDatabase` — it has to conform to a contract it did not define. The dependency arrow from the low-level module has been inverted. Instead of the high-level module reaching down to grab the low-level one, the low-level one reaches up to meet a standard set for it. That is the first inversion: **the direction of the dependency**.
 
-There is a second inversion too: in a naive design, the interface tends to be defined in terms of what the low-level module offers. After applying DIP, it is defined in terms of what the high-level module needs. The low-level module has to conform to that contract, not the other way around.
+There is a second inversion too: in a naive design, abstractions (if they exist at all) tend to be defined in terms of what the low-level module offers. After applying DIP, the abstraction is defined in terms of what the high-level module needs. The low-level module must conform to that contract, not the other way around.
 
 
 ## Part B: Abstractions should not depend on details. Details should depend on abstractions
