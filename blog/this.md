@@ -462,7 +462,8 @@ The root of all `this` confusion in TypeScript is that `this` is a runtime conce
 |Pitfall|Root cause|TypeScript detection|Fix|
 |:---|:---|:---|:---|
 |Method passed as callback (`setTimeout`, event handler, etc.)|Implicit binding lost when detached from object|Not caught by default; add `this` parameter to detect|Arrow function field or `bind` in constructor|
-|Destructuring a method `const { fn } = obj`|Same as above — method detached from object|Not caught by default|Arrow function field or `bind` in constructor|
+| Assignment to a variable with function type|Same as above — method detached from object|Not caught by default; add `this` parameter to detect|Arrow function field or `bind` in constructor|
+|Destructuring a method `const { fn } = obj`|Same as above — method detached from object|Not caught by default; add `this` parameter to detect|Arrow function field or `bind` in constructor|
 |Nested regular function inside a method|Regular function creates its own `this` binding|`noImplicitThis` (part of `strict`) flags `this` as implicit `any`|Replace nested function with an arrow function|
 |Using `this` before `super()` in a subclass constructor|Parent class has not yet initialised the instance|Hard compile-time error in TypeScript|Call `super()` first|
 |Expecting static methods to be fixed to the defining class|Static `this` is dynamic — refers to the class it is called on|No error; intentional behaviour|Use intentionally for factory patterns; document the expectation|
