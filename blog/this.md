@@ -42,9 +42,7 @@ Already we can see that the meaning of `this` is more complex than just referrin
 |14|**Class**|Static initialization block|The class (constructor)|
 |15|**Global**|Global execution context|`globalThis`|
 
-### Row-by-row breakdown
-
-#### 1. Plain function called as a method
+### 1. Plain function called as a method
 
 When a function is invoked with an object to the left of the dot, `this` is set to that object — the *receiver*. The function does not need to be defined on the object; what matters is how it is called.
 
@@ -57,7 +55,7 @@ const person = { name: "Alice", greet };
 person.greet(); // "Hello, I am Alice" — `this` is `person`
 ```
 
-#### 2. Plain function called without an object
+### 2. Plain function called without an object
 
 When a function is called with no receiver, `this` is `undefined` in strict mode (TypeScript's default) or `globalThis` in non-strict mode. This is the source of most unexpected `undefined` bugs.
 
@@ -69,7 +67,7 @@ function greet() {
 greet(); // no receiver
 ```
 
-#### 3. Function called with `call` or `apply`
+### 3. Function called with `call` or `apply`
 
 `call` and `apply` let you invoke a function immediately with an explicit `this`. The only difference is how arguments are passed: `call` takes them individually, `apply` takes them as an array.
 
@@ -84,7 +82,7 @@ greet.call(person, "Hello");    // "Hello, I am Alice"
 greet.apply(person, ["Hello"]); // "Hello, I am Alice"
 ```
 
-#### 4. Function created with `bind`
+### 4. Function created with `bind`
 
 `bind` returns a new function with `this` permanently fixed to the provided value, regardless of how or where the returned function is later called. Calling `bind` on an arrow function has no effect — arrow functions ignore `bind`.
 
@@ -100,7 +98,7 @@ boundGreet();              // "Hello, I am Alice"
 boundGreet.call({ name: "Bob" }); // Still "Hello, I am Alice" — bind wins
 ```
 
-#### 5. Arrow function
+### 5. Arrow function
 
 Arrow functions do not have their own `this`. They capture `this` lexically from the enclosing scope at the time they are *defined*, not when they are called. This makes them predictable and immune to the receiver problem.
 
@@ -116,7 +114,7 @@ const person = {
 person.greet(); // "Hello, I am Alice"
 ```
 
-#### 6. Class instance method
+### 6. Class instance method
 
 Inside an instance method, `this` is the object the method was called on — the receiver. If the method is detached from the object and called as a plain function, the binding is lost and `this` becomes `undefined` in strict mode.
 
@@ -133,7 +131,7 @@ const fn = counter.increment;
 fn(); // Runtime error: cannot read properties of undefined
 ```
 
-#### 7. Class static method
+### 7. Class static method
 
 In a static method `this` refers to the receiver of the method which can be the class (constructor function) itself, a subclass or even undefined.
 
@@ -150,7 +148,7 @@ const describe = Base.describe;
 describe(); // Runtime error: cannot read properties of undefined (strict mode)
 ```
 
-#### 8. Arrow function class field
+### 8. Arrow function class field
 
 A class field defined as an arrow function captures `this` lexically during construction — it always refers to the instance. This makes the method safe to detach and pass as a callback.
 
@@ -164,7 +162,7 @@ const timer = new Timer();
 setTimeout(timer.tick, 1000); // Safe — `this` cannot be lost
 ```
 
-#### 9. Constructor
+### 9. Constructor
 
 Inside a constructor, `this` is the newly created instance. In a subclass, `this` is not accessible until `super()` has been called — attempting to use `this` before `super()` is a hard error in both TypeScript and at runtime.
 
@@ -186,7 +184,7 @@ class Dog extends Animal {
 }
 ```
 
-#### 10. Instance getter / setter
+### 10. Instance getter / setter
 
 Getters and setters on an instance behave like instance methods — `this` is the receiver. If the property descriptor is accessed through an unrelated object via `Object.getOwnPropertyDescriptor` and the getter is called directly, the receiver changes accordingly.
 
@@ -208,7 +206,7 @@ box.value = 42;
 console.log(box.value); // 42
 ```
 
-#### 11. Static getter / setter
+### 11. Static getter / setter
 
 Static getters and setters follow the same rule as static methods — `this` is the receiver of the property which can be the class (constructor) itself, a subclass or even undefined. Though to get the getter function itself, you need to access the property descriptor and call it directly.
 
@@ -229,7 +227,7 @@ console.log(Config.env);    // "production"
 console.log(DevConfig.env); // "development"
 ```
 
-#### 12. Instance property initializer
+### 12. Instance property initializer
 
 When a class field (instance property) is initialised, `this` refers to the instance being constructed. Initialisers run as part of the constructor, in the order they are declared.
 
@@ -243,7 +241,7 @@ const g = new Greeter();
 console.log(g.message); // "Hello, I am Alice"
 ```
 
-#### 13. Static property initializer
+### 13. Static property initializer
 
 When a static class field is initialised, `this` refers to the class (constructor function) itself, not an instance.
 
@@ -256,7 +254,7 @@ class Registry {
 console.log(Registry.description); // "This is the Registry class"
 ```
 
-#### 14. Static initialization block
+### 14. Static initialization block
 
 A static initialization block (`static { ... }`) runs once when the class is evaluated. Inside it, `this` refers to the class itself, making it useful for one-time setup that requires access to other static members.
 
@@ -273,7 +271,7 @@ class AppConfig {
 }
 ```
 
-#### 15. Global execution context
+### 15. Global execution context
 
 At the top level of a script (outside any function or class), `this` is `globalThis` — `window` in browsers, `global` in Node.js. In ES modules, the top-level `this` is `undefined`.
 
