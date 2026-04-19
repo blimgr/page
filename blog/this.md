@@ -293,9 +293,9 @@ This is a powerful tool: it catches the classic `this`-losing bug at compile tim
 
 ## Common pitfalls
 
-### Assigning a method to a function type
+### Assigning a method
 
-This can happen when you do an explicit assignment of a method to a variable with a function type or when you pass a method as an argument of function type. In both cases, the method loses its `this` context, because when it is called, there is no object to provide the context.
+When a method is assigned, it loses its `this` context. When subsequently gets called via the assignment without a receiver, `this` becomes `undefined` in strict mode or `globalThis` in non-strict mode, leading to runtime errors when the method tries to access properties on `this`.
 
 This is the single most common `this` bug in TypeScript.
 
@@ -328,7 +328,28 @@ increment(); // Runtime error
 
 Here we will also lose the `this` context and get a runtime error when we call `increment()`, because it is no longer being called as a method on the `counter` object.
 
+**Protection : use this parameter to catch at compile time**
+
+In order to protect against such bugs, you can add a `this` parameter to the method signature. This will cause TypeScript to type check that the method is always called with the correct `this` type, and it will give you a compile-time error if you try to call it with the wrong type. 
+
+This parameter not only protects against the common case of passing the method as a callback, but also against any other case where the method is called without the correct receiver.
+
+```typescript
+class Timer {
+  message = "Tick!";
+
+  start() {
+    setTimeout(this.tick, 1000); // TypeScript error: The 'this' context of type 'void' is not assignable to method's 'this' of type 'Timer'.
+  }
+
+  tick(this: Timer) {
+    console.log(this.message);
+  }
+}
+```
 **Fix: use an arrow function field**
+
+However, adding a `this` parameter only catches the bug at compile time. It does not fix the underlying issue that the method loses its `this` context when passed as a callback and it is uncommon and a bit verbose to add a `this` parameter to every method just to catch this bug at compile time. You still need to fix the code to ensure that `this` is correctly bound when the method is called.
 
 The cleanest solution is to define the method as a class field using arrow function syntax. `this` is then lexically bound to the instance at construction time and can never be lost.
 
@@ -348,7 +369,23 @@ class Timer {
 
 The trade-off is that arrow function fields are not on the prototype — each instance gets its own copy of the function, which uses slightly more memory. For most applications this is irrelevant.
 
-**Alternative: bind in the constructor**
+You can also use an arrow function directly in the callback.
+
+```typescript
+class Timer {
+  message = "Tick!";
+
+  tick() {
+    console.log(this.message);
+  }
+
+  start() {
+    setTimeout(() => this.tick(), 1000); // Arrow function captures `this` from start()
+  }
+}
+```
+
+**Alternative Fix: bind in the constructor**
 
 If you prefer to keep the method on the prototype, explicitly bind it in the constructor:
 
@@ -426,15 +463,7 @@ Child.create();   // returns a Child instance, not a Base instance
 
 This dynamic `this` in static methods is actually useful for factory patterns — `create()` above will always return an instance of whatever class you call it on. But it is deeply counterintuitive if you expect static methods to be fixed to the class where they were written.
 
----
-
-## Summary
-
-The root of all `this` confusion in TypeScript is that `this` is a runtime concept, not a compile-time one. Its value is set by the **call site** — how and where the function is called — not where the function is defined. This is the fundamental difference from Java or C#.
-
-### Common pitfalls and mitigations
-
-
+### Pitfall Table
 |Pitfall|Root cause|TypeScript detection|Fix|
 |:---|:---|:---|:---|
 |Method passed as callback (`setTimeout`, event handler, etc.)|Implicit binding lost when detached from object|Not caught by default; add `this` parameter to detect|Arrow function field or `bind` in constructor|
@@ -444,4 +473,6 @@ The root of all `this` confusion in TypeScript is that `this` is a runtime conce
 |Using `this` before `super()` in a subclass constructor|Parent class has not yet initialised the instance|Hard compile-time error in TypeScript|Call `super()` first|
 |Expecting static methods to be fixed to the defining class|Static `this` is dynamic — refers to the class it is called on|No error; intentional behaviour|Use intentionally for factory patterns; document the expectation|
 
-TypeScript does not solve the problem at the language level, but it gives you tools — the `this` parameter and strict mode — to catch misuse early. Understanding where `this` is set, and applying the patterns shown above, is all you need to write TypeScript that behaves exactly as you expect.
+## Summary
+
+The root of all `this` confusion in TypeScript is that `this` is a runtime concept, not a compile-time one. Its value is set by the **call site** — how and where the function is called — not where the function is defined. This is a fundamental difference from Java or C# that when you grasp it, you can understand and predict how `this` behaves in any context in TypeScript and prevent undesirable bugs and unpredictable behavior.
