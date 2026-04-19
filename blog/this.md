@@ -1,14 +1,18 @@
-# `this` Reference in Typescript
+# The Many Faces of `this` in Typescript
 
 ## Introduction
 
-A concept that is often misunderstood — especially by people with a background in languages that default to compile-time binding like Java or C# — is the concept of `this`. The confusion arises because in Java or C#, `this` always refers to the current instance of the class. In TypeScript, however, `this` can refer to different things depending on the context in which it is used, and that can lead to unexpected behavior and bugs. In this post, we will examine `this` in TypeScript and how we can mitigate the confusion around it.
+A concept that is often misunderstood — especially by people with a background in languages like Java, C# or C++ — is the concept of `this` in TypeScript/JavaScript. 
+
+The confusion arises because in Java, C# or C++, `this` is lexically bound to the current instance and cannot change based on how a method is called.  
+
+In TypeScript, however, `this` can refer to different things depending on the context in which it is used, and that can lead to unexpected behavior and bugs. In this post, we will examine `this` in TypeScript and how we can mitigate the confusion around it.
 
 ## How `this` works
 
-In a language that defaults to compile-time binding such as Java, C#, or C\+\+, the value of `this` is determined at compile time and always refers to the current instance of the class.
+In languages like Java or C#, this is lexically bound to the current instance and cannot change based on how a method is called.
 
-In contrast, in a language that defaults to runtime binding such as JavaScript and TypeScript, the value of `this` is determined at runtime based on how a function is called.
+In contrast, in JavaScript and TypeScript, the value of `this` is determined at runtime based on how a function is called.
 
 Let's look at the documentation about `this`. <a href="https://www.typescriptlang.org/docs/handbook/2/classes.html#this-at-runtime-in-classes" target="_blank">Typescript Documentation</a> says:
 
@@ -30,9 +34,9 @@ If it is called with `call`, `apply`, or `bind`, `this` is explicitly set to the
 
 Arrow functions capture `this` lexically from the surrounding scope at the time they are defined.
 
-In classs constructors and in instance property initializers, `this` refers to the newly created instance. 
+In class constructors and in instance property initializers, `this` refers to the newly created instance. 
 
-In static initialaization blocks and static property initializers, `this` refers to the class itself.
+In static initialization blocks and static property initializers, `this` refers to the class itself.
 
 In global scope, `this` always refers to `globalThis`.
 
@@ -90,7 +94,7 @@ bob.greet(); // "Hello, I am Bob" — `this` is still `bob` because of the recei
 ```
 #### b. No Receiver
 When a function (plain function, method, getter, setter, static or instance) is assigned¹, if it has any receiver, it is lost.
-If then it is called through that assignment without an object `this` becomes `undefined` in strict mode or `globalThis` in non-strict mode.
+If it is then called via that assignment without an object `this` becomes `undefined` in strict mode or `globalThis` in non-strict mode.
 
 ¹ This can happen through an explicit assignment to a variable with a function type, through passing the method as an argument of function type, or through destructuring assignment, etc.
 
@@ -121,18 +125,17 @@ class Counter {
 }
 
 const counter = new Counter(5);
-const secondCounter = new Counter(10);
 
 const increment = counter.increment;
-increment.call(secondCounter); // 11 — `this` is secondCounter
-increment.apply(secondCounter); // 12 — `this` is secondCounter
+increment.call(new Counter(10)); // 11 — `this` is new Counter(10)
+increment.apply(new Counter(10)); // 11 — `this` is new Counter(10)
 
 const { increment: inc } = counter;
-inc.call(secondCounter); // 13 — `this` is secondCounter
-inc.apply(secondCounter); // 14 — `this` is secondCounter
+inc.call(new Counter(10)); // 11 — `this` is new Counter(10)
+inc.apply(new Counter(10)); // 11 — `this` is new Counter(10)
 ```
 
-When a function (plain function, method, getter, setter, static or instance) is called with `bind`, it returns a new function with `this` permanently set to the first argument used in `bind`.
+When a function (plain function, method, getter, setter, static or instance) is called with `bind`, it returns a new function with `this` permanently set to the first argument used in `bind`. Note that a bound function cannot be re-bound with `call` or `apply` — the `this` value will always be the one provided to `bind`.
 
 ```typescript
 class Counter {
@@ -155,7 +158,7 @@ setTimeout(counter.increment, 1000); // works — `this` is still `counter` beca
 ```
 ### 2. Arrow Functions
 
-Arrow functions do not have their own `this`. They capture `this` lexically from the enclosing scope at the time they are *defined*, not when they are called. This makes them predictable and immune to the receiver problem.
+Arrow functions do not have their own `this`. They capture `this` lexically from the enclosing scope at the time they are *defined*, not when they are called. This makes them predictable and avoids dynamic rebinding issues.
 
 ```typescript
 const person = {
@@ -188,7 +191,7 @@ class Counter {
   }
 }
 
-console.log(Counter.prototype.decrement); // { decrement: [Function: decrement] }
+console.log(Counter.prototype.decrement); // [Function: decrement]
 console.log(Counter.prototype.increment); // undefined
 ```
 ### 3. Constructors and Static Initialization Blocks
@@ -228,7 +231,7 @@ class AppConfig {
 ```
 ### 4. Property Initializers
 
-When a class field (instance property) is initialised, `this` refers to the instance being constructed. Initialisers run as part of the constructor, in the order they are declared.
+When a class field (instance property) is initialized, `this` refers to the instance being constructed. Initializers run as part of the constructor, in the order they are declared.
 
 ```typescript
 class Greeter {
@@ -240,7 +243,7 @@ const g = new Greeter();
 console.log(g.message); // "Hello, I am Alice"
 ```
 
-When a static property is initialised, `this` refers to the class (constructor function) it is defined in.
+When a static property is initialized, `this` refers to the class (constructor function) it is defined in.
 
 ```typescript
 class AppConfig {
@@ -295,7 +298,7 @@ This is a powerful tool: it catches the classic `this`-losing bug at compile tim
 
 ### Assigning a method
 
-When a method is assigned, it loses its `this` context. When subsequently gets called via the assignment without a receiver, `this` becomes `undefined` in strict mode or `globalThis` in non-strict mode, leading to runtime errors when the method tries to access properties on `this`.
+When a method is assigned, it loses its `this` context. When subsequently called via the assignment without a receiver, `this` becomes `undefined` in strict mode or `globalThis` in non-strict mode, leading to runtime errors when the method tries to access properties on `this`.
 
 This is the single most common `this` bug in TypeScript.
 
@@ -319,7 +322,7 @@ When `setTimeout` eventually calls `tick`, it calls it as a plain function. The 
 
 The callback can be an event handler, a promise callback, an array method callback, or any other function that expects a function argument.
 
-A more special and rare case of assignment is when you assign to a variable through destructuring:
+A more subtle and less obvious case of assignment is when you assign to a variable through destructuring:
 
 ```typescript
 const { increment } = counter;
@@ -463,14 +466,14 @@ Child.create();   // returns a Child instance, not a Base instance
 
 This dynamic `this` in static methods is actually useful for factory patterns — `create()` above will always return an instance of whatever class you call it on. But it is deeply counterintuitive if you expect static methods to be fixed to the class where they were written.
 
-### Pitfall Table
+### Pitfall Quick Reference
 |Pitfall|Root cause|TypeScript detection|Fix|
 |:---|:---|:---|:---|
 |Method passed as callback (`setTimeout`, event handler, etc.)|Implicit binding lost when detached from object|Not caught by default; add `this` parameter to detect|Arrow function field or `bind` in constructor|
 | Assignment to a variable with function type|Same as above — method detached from object|Not caught by default; add `this` parameter to detect|Arrow function field or `bind` in constructor|
 |Destructuring a method `const { fn } = obj`|Same as above — method detached from object|Not caught by default; add `this` parameter to detect|Arrow function field or `bind` in constructor|
 |Nested regular function inside a method|Regular function creates its own `this` binding|`noImplicitThis` (part of `strict`) flags `this` as implicit `any`|Replace nested function with an arrow function|
-|Using `this` before `super()` in a subclass constructor|Parent class has not yet initialised the instance|Hard compile-time error in TypeScript|Call `super()` first|
+|Using `this` before `super()` in a subclass constructor|Parent class has not yet initialized the instance|Hard compile-time error in TypeScript|Call `super()` first|
 |Expecting static methods to be fixed to the defining class|Static `this` is dynamic — refers to the class it is called on|No error; intentional behaviour|Use intentionally for factory patterns; document the expectation|
 
 ## Summary

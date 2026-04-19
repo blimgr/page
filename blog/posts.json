@@ -1,5 +1,16 @@
 [
   {
+    "slug": "this",
+    "title": "The Many Faces of `this` in Typescript",
+    "date": "2026-04-199",
+    "summary": "An explanation of the different ways `this` can be determined in JavaScript and how to avoid common pitfalls.",
+    "tags": [
+      "Typescript",
+      "JavaScript"
+    ],
+    "contentPath": "blog/this.md"
+  },
+  {
     "slug": "magic-values",
     "title": "Constants Don’t Fix Magic Values — Names Do",
     "date": "2026-04-18",
