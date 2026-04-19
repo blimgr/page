@@ -52,7 +52,7 @@ Case|What `this` refers to| Section |
 | Static initialization block|The class (constructor)|3. Constructors and Static Initialization Blocks|
 | Instance property initializer|The instance being created|4. Property Initializers|
 | Static property initializer|The class (constructor)|4. Property Initializers|
-| Global scope|`globalThis`|5. Global Scope|
+| Global scope|`globalThis` (`undefined` in ES modules)|5. Global Scope|
 
 
 
