@@ -10,7 +10,7 @@ In TypeScript, however, `this` can refer to different things depending on the co
 
 ## How `this` works
 
-In languages like Java or C#, this is lexically bound to the current instance and cannot change based on how a method is called.
+In languages like Java, C# or C++, this is lexically bound to the current instance and cannot change based on how a method is called.
 
 In contrast, in JavaScript and TypeScript, the value of `this` is determined at runtime based on how a function is called.
 
