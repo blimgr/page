@@ -1,11 +1,11 @@
 [
   {
     "slug": "this",
-    "title": "The Many Faces of `this` in Typescript",
+    "title": "The Many Faces of `this` in TypeScript",
     "date": "2026-04-19",
-    "summary": "An explanation of the different ways `this` can be determined in Typescript and how to avoid common pitfalls.",
+    "summary": "An explanation of the different ways `this` can be determined in TypeScript and how to avoid common pitfalls.",
     "tags": [
-      "Typescript",
+      "TypeScript",
       "JavaScript"
     ],
     "contentPath": "blog/this.md"

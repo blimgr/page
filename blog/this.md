@@ -1,4 +1,4 @@
-# The Many Faces of `this` in Typescript
+# The Many Faces of `this` in TypeScript
 
 ## Introduction
 
@@ -14,7 +14,7 @@ In languages like Java or C#, this is lexically bound to the current instance an
 
 In contrast, in JavaScript and TypeScript, the value of `this` is determined at runtime based on how a function is called.
 
-Let's look at the documentation about `this`. <a href="https://www.typescriptlang.org/docs/handbook/2/classes.html#this-at-runtime-in-classes" target="_blank">Typescript Documentation</a> says:
+Let's look at the documentation about `this`. <a href="https://www.typescriptlang.org/docs/handbook/2/classes.html#this-at-runtime-in-classes" target="_blank">TypeScript Documentation</a> says:
 
 > It's important to remember that TypeScript doesn't change the runtime behavior of JavaScript, and that JavaScript is somewhat famous for having some peculiar runtime behaviors.
 
