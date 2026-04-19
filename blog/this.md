@@ -37,23 +37,23 @@ In static initialaization blocks and static property initializers, `this` refers
 In global scope, `this` always refers to `globalThis`.
 
 ### `this` Behavior
-|#|Case|What `this` refers to|
-|:---|:---|:---|
-|1| Function called as a method (`obj.fn()`)|The receiver (the object before the dot)|
-|2| Function called without an object|`undefined` (strict mode) / `globalThis` (non-strict mode)|
-|3| Function called with `call` / `apply`|The object passed as the first argument|
-|4| Function created with `bind`|The object passed to `bind` (permanently bound)|
-|5| Arrow function|Lexically captured from surrounding scope (at definition time)|
-|6| Class constructor|The newly created instance|
-|7| Instance property initializer|The instance being created|
-|8| Static initialization block|The class (constructor)|
-|9| Static property initializer|The class (constructor)|
-|10| Global scope|`globalThis`|
+Case|What `this` refers to| Section |
+|:---|:---|---:|
+| Function called as a method (`obj.fn()`)|The receiver (the object before the dot)|1.a. Functions - Receiver|
+| Function called without an object|`undefined` (strict mode) / `globalThis` (non-strict mode)|1.b. Functions - No Receiver|
+| Function called with `call` / `apply`|The object passed as the first argument|1.c. Functions - Usage of `call`, `apply` or `bind`|
+| Function created with `bind`|The object passed to `bind` (permanently bound)|1.c. Functions - Usage of `call`, `apply` or `bind`|
+| Arrow function|Lexically captured from surrounding scope (at definition time)|2. Arrow Functions|
+| Class constructor|The newly created instance| 3. Constructors and Static Initialization Blocks|
+| Static initialization block|The class (constructor)|3. Constructors and Static Initialization Blocks|
+| Instance property initializer|The instance being created|4. Property Initializers|
+| Static property initializer|The class (constructor)|4. Property Initializers|
+| Global scope|`globalThis`|5. Global Scope|
 
 
 
 ### 1. Functions
-#### Receiver
+#### a. Receiver
 When a function (plain function, method, getter¹, setter¹, static² or instance) is called on an instance of a class, `this` is the instance (the receiver). 
 
 Note that the receiver is determined at the call site, not where the function is defined. This means that you can define a method on one class and call it on an instance of another class, and `this` will refer to the instance that is calling the method, not the class where the method was defined.
@@ -88,9 +88,11 @@ bob.greet(); // "Hello, I am Bob" — `this` is `bob`
 bob.greet = alice.greet; // Method from alice assigned to bob
 bob.greet(); // "Hello, I am Bob" — `this` is still `bob` because of the receiver
 ```
-##### No Receiver
-When a function (plain function, method, getter, setter, static or instance) is assigned, if it has any receiver, it is lost.
+#### b. No Receiver
+When a function (plain function, method, getter, setter, static or instance) is assigned¹, if it has any receiver, it is lost.
 If then it is called through that assignment without an object `this` becomes `undefined` in strict mode or `globalThis` in non-strict mode.
+
+¹ This can happen through an explicit assignment to a variable with a function type, through passing the method as an argument of function type, or through destructuring assignment, etc.
 
 ```typescript
 class Counter {
@@ -106,8 +108,8 @@ inc(); // TypeError: Cannot read property 'count' of undefined
 
 setTimeout(counter.increment, 1000); // callback assignment — TypeError: Cannot read property 'count' of undefined
 ```
-##### Usage of `call`, `apply` or `bind`
-When a function is called with `call` or `apply`, the first argument explicitly sets the value of `this` for that call.
+#### c. Usage of `call`, `apply` or `bind`
+When a function (plain function, method, getter, setter, static or instance) is called with `call` or `apply`, the first argument explicitly sets the value of `this` for that call.
 
 ```typescript
 class Counter {
@@ -130,7 +132,7 @@ inc.call(secondCounter); // 13 — `this` is secondCounter
 inc.apply(secondCounter); // 14 — `this` is secondCounter
 ```
 
-When a method is called with `bind`, it returns a new function with `this` permanently set to the provided value.
+When a function (plain function, method, getter, setter, static or instance) is called with `bind`, it returns a new function with `this` permanently set to the first argument used in `bind`.
 
 ```typescript
 class Counter {
@@ -151,8 +153,7 @@ const { increment: inc } = counter;
 inc(); // works — `this` is still `counter` because of bind
 setTimeout(counter.increment, 1000); // works — `this` is still `counter` because of bind
 ```
-
-### 5. Arrow function
+### 2. Arrow Functions
 
 Arrow functions do not have their own `this`. They capture `this` lexically from the enclosing scope at the time they are *defined*, not when they are called. This makes them predictable and immune to the receiver problem.
 
@@ -167,23 +168,30 @@ const person = {
 
 person.greet(); // "Hello, I am Alice"
 ```
-
-
-### 8. Arrow function class field
-
-A class field defined as an arrow function captures `this` lexically during construction — it always refers to the instance. This makes the method safe to detach and pass as a callback.
+This makes the arrow functions behave like methods that are permanently bound using `bind`. For instance properties set to arrow functions there is a difference: they are not on the prototype, but each instance gets its own copy of the function.
 
 ```typescript
-class Timer {
-  message = "Tick!";
-  tick = () => console.log(this.message); // `this` is permanently the Timer instance
+class Counter {
+
+  constructor() {
+    this.decrement = this.decrement.bind(this);
+  }
+  count = 0;
+  increment = () => {
+    this.count++;
+    console.log(this.count);
+  };
+
+  decrement() {
+    this.count--;
+    console.log(this.count);
+  }
 }
 
-const timer = new Timer();
-setTimeout(timer.tick, 1000); // Safe — `this` cannot be lost
+console.log(Counter.prototype.decrement); // { decrement: [Function: decrement] }
+console.log(Counter.prototype.increment); // undefined
 ```
-
-### 9. Constructor
+### 3. Constructors and Static Initialization Blocks
 
 Inside a constructor, `this` is the newly created instance. In a subclass, `this` is not accessible until `super()` has been called — attempting to use `this` before `super()` is a hard error in both TypeScript and at runtime.
 
@@ -204,9 +212,21 @@ class Dog extends Animal {
   }
 }
 ```
+Static initialization blocks (`static { ... }`) also have `this` bound to the class (constructor function) they are defined in, and they run once when the class is evaluated.
 
+```typescript
+class AppConfig {
+  static port: number;
+  static host: string;
 
-### 12. Instance property initializer
+  static {
+    this.port = parseInt(process.env.PORT ?? "3000", 10); // `this` is the AppConfig class
+    this.host = process.env.HOST ?? "localhost"; // `this` is the AppConfig class
+    console.log(`Configured: ${this.host}:${this.port}`); // `this` is the AppConfig class
+  }
+}
+```
+### 4. Property Initializers
 
 When a class field (instance property) is initialised, `this` refers to the instance being constructed. Initialisers run as part of the constructor, in the order they are declared.
 
@@ -220,39 +240,18 @@ const g = new Greeter();
 console.log(g.message); // "Hello, I am Alice"
 ```
 
-### 13. Static property initializer
-
-When a static class field is initialised, `this` refers to the class (constructor function) itself, not an instance.
-
-```typescript
-class Registry {
-  static label = "Registry";
-  static description = `This is the ${this.label} class`; // `this` is Registry
-}
-
-console.log(Registry.description); // "This is the Registry class"
-```
-
-### 14. Static initialization block
-
-A static initialization block (`static { ... }`) runs once when the class is evaluated. Inside it, `this` refers to the class itself, making it useful for one-time setup that requires access to other static members.
+When a static property is initialised, `this` refers to the class (constructor function) it is defined in.
 
 ```typescript
 class AppConfig {
-  static port: number;
-  static host: string;
-
-  static {
-    this.port = parseInt(process.env.PORT ?? "3000", 10);
-    this.host = process.env.HOST ?? "localhost";
-    console.log(`Configured: ${this.host}:${this.port}`);
-  }
+  static port = parseInt(process.env.PORT ?? "3000", 10);
+  static host = process.env.HOST ?? "localhost";
+  static description = `Configured: ${this.host}:${this.port}`; // `this` is the AppConfig class
 }
 ```
+### 5. Global Scope
 
-### 15. Global execution context
-
-At the top level of a script (outside any function or class), `this` is `globalThis` — `window` in browsers, `global` in Node.js. In ES modules, the top-level `this` is `undefined`.
+At the top level of a script (outside any function or class), `this` is `globalThis`.
 
 ```typescript
 // In a CommonJS/script context:
