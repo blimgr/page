@@ -38,7 +38,7 @@ In class constructors and in instance property initializers, `this` refers to th
 
 In static initialization blocks and static property initializers, `this` refers to the class itself.
 
-In global scope, `this` always refers to `globalThis`.
+In global scope, `this` always refers to `globalThis` (With exception to ES modules, where `this` is `undefined`).
 
 ### `this` Behavior
 Case|What `this` refers to| Section |
