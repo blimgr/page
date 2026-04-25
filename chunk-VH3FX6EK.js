@@ -1,0 +1,1 @@
+var e="blog/posts.json?v=";var t=[1,5,10,25],o=5,l=0,r=[{key:"theme-warm-amber",label:"Golden Ember"},{key:"theme-blue-amber",label:"Azure Glow"},{key:"theme-teal-coral",label:"Coral Tide"},{key:"theme-navy-mint",label:"Midnight Mint"},{key:"theme-indigo-gold",label:"Starlit Indigo"},{key:"theme-forest-green",label:"Forest Green"}];export{e as a,t as b,o as c,l as d,r as e};
